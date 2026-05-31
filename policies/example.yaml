@@ -1,0 +1,88 @@
+# RBAC Policy Definition
+# -------------------------
+# This file defines roles, their permissions, and subjects.
+# The loader (loader.py) will parse this into Python objects.
+#
+# Structure:
+#   roles:
+#     <role_name>:
+#       parent: <parent_role_name>   # optional, for inheritance
+#       permissions:
+#         - action: <action>
+#           resource: <resource>
+#           conditions:             # optional ABAC conditions
+#             ip_prefix: "10.0."
+#             time_before: "17:00"
+#
+#   subjects:
+#     <subject_name>:
+#       roles:
+#         - <role_name>
+
+roles:
+  viewer:
+    permissions:
+      - action: read
+        resource: document
+      - action: read
+        resource: report
+
+  editor:
+    parent: viewer          # inherits read:document and read:report
+    permissions:
+      - action: write
+        resource: document
+        conditions:
+          ip_prefix: "10.0."
+          time_before: "17:00"
+      - action: create
+        resource: document
+
+  admin:
+    parent: editor          # inherits everything from editor (and viewer)
+    permissions:
+      - action: delete
+        resource: document
+      - action: delete
+        resource: report
+      - action: "*"         # wildcard — admin can do anything on user resources
+        resource: user
+
+  auditor:
+    permissions:
+      - action: read
+        resource: "*"       # can read anything, but only read
+
+  moderator:                # can flag and hide documents
+    parent: viewer
+    permissions:
+      - action: flag
+        resource: document
+      - action: hide
+        resource: document
+
+subjects:
+  alice:
+    roles:
+      - admin
+
+  bob:
+    roles:
+      - editor
+
+  carol:
+    roles:
+      - viewer
+
+  dave:
+    roles:
+      - viewer
+      - auditor             # multiple roles — union of permissions
+
+  svc_account_reports:
+    roles:
+      - auditor
+
+  eve:
+    roles:
+      - moderator
