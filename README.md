@@ -1,6 +1,6 @@
 # RBAC Policy Engine
 
-I built this as part of my preparation for security engineering roles, specifically to get hands-on experience with access control systems — the kind of thing teams like Google's PRISM work on every day.
+I built this as part of my preparation for security engineering roles, specifically to get hands-on experience with access control systems
 
 The engine answers one question: **should this person be allowed to do this, right now, from where they are?** It's not just about whether you have the right role — it also checks whether the context of your request (your IP address, the time of day) matches what the policy allows. Every decision, whether allowed or denied, gets logged with a reason.
 
